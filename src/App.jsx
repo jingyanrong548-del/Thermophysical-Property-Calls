@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FLUID_TYPES } from './lib/constants'
 import { useCoolProp } from './hooks/useCoolProp'
 import ResultCard from './components/ResultCard'
@@ -10,7 +10,12 @@ import HumidAirForm from './components/Forms/HumidAirForm'
 
 export default function App() {
   const [activeType, setActiveType] = useState(1)
+  const [resultUnit, setResultUnit] = useState(null)
   const { result, error, loading, queryProps, queryHumidAir } = useCoolProp()
+
+  useEffect(() => {
+    if (result?.output_unit != null) setResultUnit(result.output_unit)
+  }, [result?.output_unit])
 
   const handleQueryProps = (params) => queryProps(params)
   const handleQueryHumidAir = (params) => queryHumidAir(params)
@@ -47,18 +52,18 @@ export default function App() {
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-stone-500">
               输入
             </h2>
-            {activeType === 1 && <PureFluidForm onQuery={handleQueryProps} />}
-            {activeType === 2 && <IncompPureForm onQuery={handleQueryProps} />}
-            {activeType === 3 && <IncompSolutionForm onQuery={handleQueryProps} />}
-            {activeType === 4 && <HeosMixtureForm onQuery={handleQueryProps} />}
-            {activeType === 5 && <HumidAirForm onQuery={handleQueryHumidAir} />}
+            {activeType === 1 && <PureFluidForm onQuery={handleQueryProps} onResultUnitChange={setResultUnit} />}
+            {activeType === 2 && <IncompPureForm onQuery={handleQueryProps} onResultUnitChange={setResultUnit} />}
+            {activeType === 3 && <IncompSolutionForm onQuery={handleQueryProps} onResultUnitChange={setResultUnit} />}
+            {activeType === 4 && <HeosMixtureForm onQuery={handleQueryProps} onResultUnitChange={setResultUnit} />}
+            {activeType === 5 && <HumidAirForm onQuery={handleQueryHumidAir} onResultUnitChange={setResultUnit} />}
           </section>
 
           <section className="rounded-xl border border-stone-700 bg-stone-900/30 p-6">
             <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-stone-500">
               结果
             </h2>
-            <ResultCard result={result} error={error} loading={loading} />
+            <ResultCard result={result} error={error} loading={loading} resultUnit={resultUnit} />
           </section>
         </div>
       </div>

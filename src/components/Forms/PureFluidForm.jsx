@@ -1,25 +1,51 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PURE_FLUIDS, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
+import { toSI, fromSI, getUnitsForFluidProperty } from '../../lib/units'
 
-export default function PureFluidForm({ onQuery, result, error, loading }) {
+const sel = (key) => getUnitsForFluidProperty(key)
+
+function formatInputValue(num) {
+  const n = Number(num)
+  if (Number.isNaN(n)) return ''
+  if (Math.abs(n) >= 1e6 || (Math.abs(n) < 0.0001 && n !== 0)) return n.toExponential(4)
+  return Math.round(n) === n ? String(n) : String(Number(n.toFixed(8)))
+}
+
+export default function PureFluidForm({ onQuery, result, error, loading, onResultUnitChange }) {
   const [fluid, setFluid] = useState(PURE_FLUIDS[0])
   const [output, setOutput] = useState('D')
   const [inputPair, setInputPair] = useState(INPUT_PAIRS[0])
   const [val1, setVal1] = useState('300')
   const [val2, setVal2] = useState('101325')
+  const [unit1, setUnit1] = useState(sel('T')[0].value)
+  const [unit2, setUnit2] = useState(sel('P')[0].value)
+  const [outputUnit, setOutputUnit] = useState(sel('D')[0].value)
 
   const fluidString = fluid.trim()
+  const units1 = sel(inputPair.k1)
+  const units2 = sel(inputPair.k2)
+  const unitsOut = sel(output)
+  useEffect(() => {
+    if (!units1.some((u) => u.value === unit1)) setUnit1(units1[0]?.value ?? unit1)
+    if (!units2.some((u) => u.value === unit2)) setUnit2(units2[0]?.value ?? unit2)
+  }, [inputPair.k1, inputPair.k2])
+  useEffect(() => {
+    if (!unitsOut.some((u) => u.value === outputUnit)) setOutputUnit(unitsOut[0]?.value ?? outputUnit)
+  }, [output])
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const si1 = toSI(inputPair.k1, val1, unit1, false)
+    const si2 = toSI(inputPair.k2, val2, unit2, false)
     onQuery({
       fluidType: 1,
       fluid: fluidString,
       output_key: output,
+      output_unit: outputUnit,
       input1_key: inputPair.k1,
-      input1_value: val1,
+      input1_value: si1,
       input2_key: inputPair.k2,
-      input2_value: val2,
+      input2_value: si2,
     })
   }
 
@@ -64,24 +90,74 @@ export default function PureFluidForm({ onQuery, result, error, loading }) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-sm text-stone-400">{inputPair.k1}</label>
-          <input
-            type="number"
-            step="any"
-            value={val1}
-            onChange={(e) => setVal1(e.target.value)}
-            className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-          />
+          <div className="flex gap-2">
+            <input
+              type="number"
+              step="any"
+              value={val1}
+              onChange={(e) => setVal1(e.target.value)}
+              className="flex-1 rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+            <select
+              value={unit1}
+              onChange={(e) => {
+                const newUnit = e.target.value
+                const si = toSI(inputPair.k1, val1, unit1, false)
+                const converted = fromSI(inputPair.k1, si, newUnit, false)
+                setUnit1(newUnit)
+                setVal1(formatInputValue(converted))
+              }}
+              className="w-24 rounded-lg border border-stone-600 bg-stone-900 px-2 py-2 text-sm text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            >
+              {units1.map((u) => (
+                <option key={u.value} value={u.value}>{u.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <div>
           <label className="mb-1 block text-sm text-stone-400">{inputPair.k2}</label>
-          <input
-            type="number"
-            step="any"
-            value={val2}
-            onChange={(e) => setVal2(e.target.value)}
-            className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-          />
+          <div className="flex gap-2">
+            <input
+              type="number"
+              step="any"
+              value={val2}
+              onChange={(e) => setVal2(e.target.value)}
+              className="flex-1 rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+            <select
+              value={unit2}
+              onChange={(e) => {
+                const newUnit = e.target.value
+                const si = toSI(inputPair.k2, val2, unit2, false)
+                const converted = fromSI(inputPair.k2, si, newUnit, false)
+                setUnit2(newUnit)
+                setVal2(formatInputValue(converted))
+              }}
+              className="w-24 rounded-lg border border-stone-600 bg-stone-900 px-2 py-2 text-sm text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            >
+              {units2.map((u) => (
+                <option key={u.value} value={u.value}>{u.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm text-stone-400">结果单位</label>
+        <select
+          value={outputUnit}
+          onChange={(e) => {
+            const u = e.target.value
+            setOutputUnit(u)
+            onResultUnitChange?.(u)
+          }}
+          className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        >
+          {unitsOut.map((u) => (
+            <option key={u.value} value={u.value}>{u.label}</option>
+          ))}
+        </select>
       </div>
       <button
         type="submit"

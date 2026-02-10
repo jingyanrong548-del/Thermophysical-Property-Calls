@@ -25,7 +25,7 @@ export const OUTPUT_PROPS = [
   { key: 'S', label: '比熵 S (J/kg/K)' },
   { key: 'C', label: '比热容 Cp (J/kg/K)' },
   { key: 'L', label: '导热系数 (W/m/K)' },
-  { key: 'V', label: '动力粘度 (m²/s)' },
+  { key: 'V', label: '比容 V (m³/kg)' },
   { key: 'M', label: '动力粘度 μ (Pa·s)' },
 ]
 

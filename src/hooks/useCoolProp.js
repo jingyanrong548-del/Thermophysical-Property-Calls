@@ -28,14 +28,18 @@ export function getIncompSolutionName(option) {
 }
 
 /**
- * 将 API 响应 { result, unit, status } 规范为 UI 使用的 { value, unit, description }
+ * 将 API 响应 { result, unit, status } 规范为 UI 使用的 { value, unit, description, output_key, output_unit, isHumidAir }
+ * output_unit 用于将 value 从 SI 转为用户选择单位显示
  */
-function normalizeResult(data, outputKey) {
+function normalizeResult(data, outputKey, outputUnit = null, isHumidAir = false) {
   if (!data) return null
   return {
     value: data.result,
     unit: data.unit ?? '-',
     description: outputKey ?? data.output_key ?? 'result',
+    output_key: outputKey ?? data.output_key,
+    output_unit: outputUnit,
+    isHumidAir,
   }
 }
 
@@ -54,6 +58,7 @@ export function useCoolProp() {
         fluid,
         composition,
         output_key,
+        output_unit,
         input1_key,
         input1_value,
         input2_key,
@@ -70,7 +75,7 @@ export function useCoolProp() {
         }
         if (fluidType === 3 && composition != null) body.composition = Number(composition)
         const data = await fetchProps(body)
-        setResult(normalizeResult(data, output_key))
+        setResult(normalizeResult(data, output_key, output_unit, false))
         return data
       }
       throw new Error('请使用湿空气接口')
@@ -98,7 +103,7 @@ export function useCoolProp() {
         input3_value: Number(params.input3_value),
       }
       const data = await fetchHumidAir(body)
-      setResult(normalizeResult(data, params.output_key))
+      setResult(normalizeResult(data, params.output_key, params.output_unit, true))
       return data
     } catch (e) {
       const msg = e.message || '请求失败'

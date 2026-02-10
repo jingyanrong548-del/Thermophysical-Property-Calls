@@ -1,4 +1,23 @@
-export default function ResultCard({ result, error, loading }) {
+import { fromSI, getUnitsForFluidProperty, getUnitsForHumidAirProperty } from '../lib/units'
+
+function getDisplayValueAndUnit(result, resultUnitOverride) {
+  const raw = result.value ?? result.result
+  const key = result.output_key
+  const isHumidAir = result.isHumidAir === true
+  const list = key ? (isHumidAir ? getUnitsForHumidAirProperty(key) : getUnitsForFluidProperty(key)) : []
+  const userUnit = (resultUnitOverride && list.some((x) => x.value === resultUnitOverride))
+    ? resultUnitOverride
+    : result.output_unit
+  if (userUnit && key && typeof raw === 'number') {
+    const u = list.find((x) => x.value === userUnit)
+    if (u) {
+      return { value: u.fromSI(raw), unit: u.label }
+    }
+  }
+  return { value: raw, unit: result.unit ?? '-' }
+}
+
+export default function ResultCard({ result, error, loading, resultUnit }) {
   if (loading) {
     return (
       <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
@@ -15,8 +34,7 @@ export default function ResultCard({ result, error, loading }) {
     )
   }
   if (!result) return null
-  const value = result.value ?? result.result
-  const unit = result.unit ?? '-'
+  const { value, unit } = getDisplayValueAndUnit(result, resultUnit)
   const desc = result.description ?? result.output_key ?? 'result'
   return (
     <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5">
