@@ -1,0 +1,45 @@
+name: Deploy to Aliyun
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # 如果你的 Vite 配置需要 base path，请在此调整，否则默认为 /
+          VITE_BASE_PATH: /
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ALIYUN_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.ALIYUN_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy with Rsync
+        run: |
+          # 使用 rsync 同步 dist 目录到阿里云
+          # --delete 会删除服务器上存在但本地不存在的文件（保持完全一致）
+          rsync -avz --delete dist/ ${{ secrets.ALIYUN_USER }}@${{ secrets.ALIYUN_HOST }}:${{ secrets.ALIYUN_DEPLOY_PATH }}

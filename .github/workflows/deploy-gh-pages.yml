@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages (Backup)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install & Build
+        run: |
+          npm ci
+          npm run build
+        env:
+          # GitHub Pages 通常需要带仓库名的 base path，除非自定义域名
+          VITE_BASE_PATH: /Thermophysical-Property-Calls/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@4
