@@ -275,11 +275,56 @@ git push origin main
 
 ## 三、故障排查速查
 
+### 3.1 rsync 报 Permission denied / exit code 23（必看）
+
+若 Actions 里 **Deploy with Rsync** 出现：
+
+- `rsync: chgrp "*** /." failed: Operation not permitted`
+- `cannot delete non-empty directory: .well-known/...`
+- `unlink(...) failed: Permission denied (13)`（如 `.user.ini`、`404.html`）
+- `mkdir "*** /assets" failed: Permission denied (13)`
+- **Process completed with exit code 23**
+
+说明服务器上**部署目录及其中的文件不属于你用来部署的 SSH 用户**（例如宝塔用 root/www 建站，而 GitHub 用的是 `admin`）。按下面在**阿里云服务器上**执行（需 root 或 sudo）。
+
+**重要**：若先执行 `chown` 会报 `.user.ini: Operation not permitted`，是因为宝塔给该文件加了不可变属性，必须先执行步骤 1 再执行步骤 2。
+
+**步骤 1：解除宝塔对 .user.ini 的锁定（必须先做，否则 chown 也会报 Operation not permitted）**
+
+```bash
+sudo chattr -i /www/wwwroot/tpc.jingyanrong.com/.user.ini
+```
+
+若提示文件不存在可忽略。若本账号执行 `chattr` 仍报错，改用 root 登录或到宝塔面板的终端（默认 root）执行上述命令（去掉 `sudo`）。
+
+**步骤 2：把整站目录属主改为部署用户（与 GitHub Secret 里 `ALIYUN_USER` 一致）**
+
+```bash
+sudo chown -R admin:admin /www/wwwroot/tpc.jingyanrong.com
+```
+
+**步骤 3：让 Nginx 仍能读（可选，若 Nginx 以 www 运行）**
+
+```bash
+# 仅当 Nginx 运行用户是 www 时，可把组改为 www 并给组读权限
+sudo chown -R admin:www /www/wwwroot/tpc.jingyanrong.com
+sudo chmod -R 755 /www/wwwroot/tpc.jingyanrong.com
+```
+
+若你希望部署用户完全拥有目录（推荐），保持步骤 1 的 `admin:admin` 即可，Nginx 一般仍能读 755 的目录。
+
+**步骤 4：重新跑一次部署**
+
+仓库 **Actions** → **Deploy to Aliyun** → **Run workflow**。若仍有报错，再看日志里是哪一个路径 Permission denied，对该路径再执行一次 `sudo chown -R admin:admin 该路径`。
+
+---
+
+### 3.2 其他常见问题
+
 | 现象 | 可能原因 | 处理建议 |
 |------|----------|----------|
 | **Load key "... invalid format"** | SSH 私钥格式错误或复制不完整 | 重新复制私钥，确保含 BEGIN/END 两行且无多余空格 |
 | **Permission denied (publickey)** | 服务器上未加入对应公钥或用户错 | 用 `ssh-copy-id` 把公钥写入 `~/.ssh/authorized_keys`，Secret 中 `ALIYUN_USER` 与登录用户一致 |
-| **Permission denied (目录)** | 网站目录属主不是 `ALIYUN_USER` | 在服务器执行 `sudo chown -R admin:admin /www/wwwroot/tpc.jingyanrong.com` |
 | **rsync: command not found** | 服务器未安装 rsync | 在服务器安装：`yum install rsync` 或 `apt install rsync` |
 | **白屏 / 刷新 404** | 未做 SPA 回退 | Nginx 中 `location /` 增加 `try_files $uri $uri/ /index.html;` |
 | **npm ci 失败** | 缺少 lockfile 或 Node 版本不符 | 本地执行 `npm install` 生成/更新 `package-lock.json` 并提交，workflow 使用 Node 20 |
