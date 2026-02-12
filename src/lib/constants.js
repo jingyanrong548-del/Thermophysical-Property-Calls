@@ -52,6 +52,7 @@ export const OUTPUT_PROPS = [
   { key: 'L', label: '导热系数 (W/m/K)' },
   { key: 'V', label: '比容 V (m³/kg)' },
   { key: 'VISC', label: '动力粘度 μ (Pa·s)' },
+  { key: 'T_freeze', label: '冰点 T_freeze (K)' },
 ]
 
 export const INPUT_PAIRS = [

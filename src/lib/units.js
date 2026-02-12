@@ -90,6 +90,7 @@ const relativeHumidityUnits = [
 /** 按物性代码获取可选单位列表（第一个为 API 使用的 SI 单位） */
 export const UNITS_BY_PROPERTY = {
   T: tempUnits,
+  T_freeze: tempUnits, // 冰点温度
   D: tempUnits,   // 露点温度
   B: tempUnits,   // 湿球温度
   P: pressureUnits,
@@ -144,7 +145,7 @@ export function getUnitsForHumidAirProperty(key) {
 
 /** 流体物性（纯/不可压缩/混合）输入输出用 */
 export function getUnitsForFluidProperty(key) {
-  if (key === 'T') return tempUnits
+  if (key === 'T' || key === 'T_freeze') return tempUnits
   if (key === 'P') return pressureUnits
   if (key === 'Q') return dimensionlessUnits
   if (key === 'D') return densityUnits

@@ -63,6 +63,7 @@
 | L | 热导率 | W/m/K |
 | VISC | 动力粘度 | Pa·s |
 | W | 音速 | m/s |
+| T_freeze | 冰点（仅部分不可压缩溶液，如 IcePG、IceEA） | K |
 | Tcrit / Pcrit / M 等 | 临界/摩尔质量等 | 见 GET /api/properties |
 
 **常用输入组合**：`(P,T)`、`(P,Q)`、`(T,Q)`、`(P,H)`、`(T,H)`。  
