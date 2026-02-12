@@ -8,17 +8,18 @@ import { FLUID_TYPES } from '../lib/constants'
 export function buildFluidString(fluidType, fluidOption, fraction, mixtureParts) {
   if (fluidType === 5) return null
   const typeInfo = FLUID_TYPES.find((t) => t.id === fluidType)
-  if (!typeInfo || !fluidOption) return ''
+  if (!typeInfo) return ''
 
-  if (fluidType === 1) return fluidOption.trim()
-  if (fluidType === 2) return `INCOMP::${fluidOption.trim()}`
-  if (fluidType === 3) return `INCOMP::${fluidOption.replace(/\s*\([^)]*\)\s*/, '').trim()}`
   if (fluidType === 4) {
     if (!Array.isArray(mixtureParts) || mixtureParts.length < 2) return ''
     const sum = mixtureParts.reduce((s, p) => s + (p.fraction || 0), 0)
     if (Math.abs(sum - 1) > 0.001) return ''
     return 'HEOS::' + mixtureParts.map((p) => `${p.name}[${p.fraction}]`).join('&')
   }
+  if (!fluidOption) return ''
+  if (fluidType === 1) return fluidOption.trim()
+  if (fluidType === 2) return `INCOMP::${fluidOption.trim()}`
+  if (fluidType === 3) return `INCOMP::${fluidOption.replace(/\s*\([^)]*\)\s*/, '').trim()}`
   return ''
 }
 
