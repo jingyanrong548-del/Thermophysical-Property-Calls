@@ -1,6 +1,6 @@
 # Thermophysical-Property-Calls
 
-基于 **CoolProp 统一 API** 的物性查询 Web 应用，严格遵循项目内 **`API_所有类别调用规则.md`**（五大工质分类、请求/响应格式）。
+基于 **CoolProp 统一 API** 的物性查询 Web 应用，严格遵循 **coolpropapi.jingyanrong.com** 规范：`API_所有类别调用规则.md`、`EXTERNAL_API_CALL_GUIDE.md`（五大工质分类、请求/响应格式）。
 
 **本应用不包含后端**，所有物性计算请求发往统一 API：
 
@@ -47,7 +47,8 @@ VITE_API_URL=https://coolpropapi.jingyanrong.com npm run build
 ## 项目结构
 
 ```
-├── API_所有类别调用规则.md   # 唯一 API 规则文档，Cursor 中 @ 引用
+├── API_所有类别调用规则.md   # API 完整规则，Cursor 中 @ 引用
+├── EXTERNAL_API_CALL_GUIDE.md  # coolpropapi.jingyanrong.com 外部调用提示语
 ├── src/
 │   ├── lib/constants.js     # 五大类选项与工质列表
 │   ├── hooks/useCoolProp.js # 拼接 fluid、调用 API、归一化结果
@@ -67,4 +68,6 @@ VITE_API_URL=https://coolpropapi.jingyanrong.com npm run build
 | 4 可压缩混合物 | POST /api/props | `fluid`=HEOS::A[x1]&B[x2]，仅 (P,T)/(P,Q)/(T,Q) |
 | 5 湿空气 | POST /api/humid-air/props | 3 组 input_key/value + 1 个 output_key |
 
-详见 `API_所有类别调用规则.md`。
+详见 `API_所有类别调用规则.md`、`EXTERNAL_API_CALL_GUIDE.md`；与 CoolProp 官网对照见 `docs/COOLPROP_OFFICIAL_ALIGNMENT.md`（位于 API 服务端项目）。  
+- 湿空气接口 404：参考 **`阿里云API部署排查流程.md`** 排查 coolprop-api 部署。  
+- 怀疑本前端阿里云配置有误：参考 **`阿里云前端部署检测流程.md`** 排查 tpc.jingyanrong.com。

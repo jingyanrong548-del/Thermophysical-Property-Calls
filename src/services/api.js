@@ -1,6 +1,6 @@
 /**
  * CoolProp 统一 API 客户端
- * 规则文档：@API_所有类别调用规则.md
+ * 规则：API_所有类别调用规则.md、EXTERNAL_API_CALL_GUIDE.md
  * 生产：https://coolpropapi.jingyanrong.com  本地：http://localhost:8000
  */
 const API_BASE = import.meta.env.VITE_API_URL || 'https://coolpropapi.jingyanrong.com'

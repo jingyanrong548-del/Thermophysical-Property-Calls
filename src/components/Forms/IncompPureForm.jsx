@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { INCOMP_PURE, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
+import { INCOMP_PURE, INCOMP_PURE_LABELS, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
 import { toSI, fromSI, getUnitsForFluidProperty } from '../../lib/units'
 
 const sel = (key) => getUnitsForFluidProperty(key)
@@ -59,7 +59,7 @@ export default function IncompPureForm({ onQuery, result, error, loading, onResu
           className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
         >
           {INCOMP_PURE.map((f) => (
-            <option key={f} value={f}>INCOMP::{f}</option>
+            <option key={f} value={f}>{INCOMP_PURE_LABELS[f] ?? `INCOMP::${f}`}</option>
           ))}
         </select>
       </div>

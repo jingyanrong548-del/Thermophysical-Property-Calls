@@ -152,7 +152,7 @@ export function getUnitsForFluidProperty(key) {
   if (key === 'S' || key === 'C' || key === 'Cv') return entropyUnits
   if (key === 'V') return specificVolumeUnits
   if (key === 'L' || key === 'K') return conductivityUnits
-  if (key === 'M' || key === 'VISC') return viscosityUnits
+  if (key === 'VISC' || key === 'M') return viscosityUnits
   if (key === 'W') return speedUnits
   return dimensionlessUnits
 }

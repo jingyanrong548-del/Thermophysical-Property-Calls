@@ -270,6 +270,8 @@ git push origin main
 - 浏览器访问：`http://tpc.jingyanrong.com`（若已配置 SSL 则用 `https://tpc.jingyanrong.com`）。
 - 应能看到物性查询界面；若出现白屏，检查 Nginx 是否配置了 `try_files $uri $uri/ /index.html;`。
 - 前端会请求 `https://coolpropapi.jingyanrong.com`，确保该 API 可访问。
+- 若湿空气等接口返回 404，见 **`阿里云API部署排查流程.md`** 逐步排查 coolprop-api 的部署。  
+- 若怀疑**本前端**在阿里云的配置有问题，见 **`阿里云前端部署检测流程.md`** 排查 tpc.jingyanrong.com。
 
 ---
 

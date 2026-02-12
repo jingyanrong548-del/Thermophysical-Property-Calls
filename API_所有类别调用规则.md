@@ -4,7 +4,8 @@
 > **Cursor 用法**：在对话中输入 `@API_所有类别调用规则.md` 即可引用全文，无需复制内容。  
 > **API 根地址**：`https://coolpropapi.jingyanrong.com`（生产） / `http://localhost:8000`（本地）  
 > **文档**：`/docs`（Swagger）、`/redoc`  
-> **请求/响应**：`Content-Type: application/json`，UTF-8；支持 CORS。
+> **请求/响应**：`Content-Type: application/json`，UTF-8；支持 CORS。  
+> **与 CoolProp 官网对照**：五类介质（纯流体、不可压缩纯流体、不可压缩溶液、可压缩混合物、湿空气）的调用规则与 [CoolProp 官网](http://www.coolprop.org/) 一致，详见 [docs/COOLPROP_OFFICIAL_ALIGNMENT.md](docs/COOLPROP_OFFICIAL_ALIGNMENT.md)。
 
 ---
 

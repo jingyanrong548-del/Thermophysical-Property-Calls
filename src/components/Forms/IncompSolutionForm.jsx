@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { INCOMP_SOLUTIONS, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
+import { INCOMP_SOLUTIONS, INCOMP_SOLUTION_LABELS, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
 import { getIncompSolutionName } from '../../hooks/useCoolProp'
 import { toSI, fromSI, getUnitsForFluidProperty } from '../../lib/units'
 
@@ -42,9 +42,11 @@ export default function IncompSolutionForm({ onQuery, result, error, loading, on
     if (frac < 0 || frac > 1) return
     const si1 = toSI(inputPair.k1, val1, unit1, false)
     const si2 = toSI(inputPair.k2, val2, unit2, false)
+    // CoolProp 不可压缩溶液格式：INCOMP::名称[浓度]，如 INCOMP::LiBr[0.23]、INCOMP::EG[0.5]
+    const fluidWithFrac = baseName ? `INCOMP::${baseName}[${frac}]` : ''
     onQuery({
       fluidType: 3,
-      fluid: fluidString || `INCOMP::${baseName}`,
+      fluid: fluidWithFrac || fluidString || `INCOMP::${baseName}`,
       composition: frac,
       output_key: output,
       output_unit: outputUnit,
@@ -65,7 +67,7 @@ export default function IncompSolutionForm({ onQuery, result, error, loading, on
           className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
         >
           {INCOMP_SOLUTIONS.map((f) => (
-            <option key={f} value={f}>{f}</option>
+            <option key={f} value={f}>{INCOMP_SOLUTION_LABELS[f] ?? f}</option>
           ))}
         </select>
       </div>
