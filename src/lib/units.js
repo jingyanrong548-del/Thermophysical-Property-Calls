@@ -128,7 +128,7 @@ export function getUnitsForProperty(key) {
   return UNITS_BY_PROPERTY[key] ?? UNITS_BY_PROPERTY.D_rho ?? dimensionlessUnits
 }
 
-/** 湿空气：D/B 是温度，W 是含湿量 */
+/** 湿空气：D/B 是温度，W 是含湿量；Density 为 1/V 计算所得 */
 export function getUnitsForHumidAirProperty(key) {
   if (key === 'T' || key === 'D' || key === 'B') return tempUnits
   if (key === 'P' || key === 'P_w') return pressureUnits
@@ -136,6 +136,7 @@ export function getUnitsForHumidAirProperty(key) {
   if (key === 'W') return humidityRatioUnits
   if (key === 'H' || key === 'Hha') return enthalpyUnits
   if (key === 'V' || key === 'Vha') return specificVolumeUnits
+  if (key === 'Density') return densityUnits
   if (key === 'S' || key === 'Sha' || key === 'C' || key === 'Cha' || key === 'CV' || key === 'CVha') return entropyUnits
   if (key === 'K') return conductivityUnits
   if (key === 'M') return viscosityUnits

@@ -94,8 +94,10 @@ export function useCoolProp() {
     setResult(null)
     setLoading(true)
     try {
+      // 密度：API 无直接 key，请求比容 V 后在前端用 ρ = 1/V 计算
+      const outputKey = params.output_key === 'Density' ? 'V' : params.output_key
       const body = {
-        output_key: params.output_key,
+        output_key: outputKey,
         input1_key: params.input1_key,
         input1_value: Number(params.input1_value),
         input2_key: params.input2_key,
@@ -104,8 +106,11 @@ export function useCoolProp() {
         input3_value: Number(params.input3_value),
       }
       const data = await fetchHumidAir(body)
-      setResult(normalizeResult(data, params.output_key, params.output_unit, true))
-      return data
+      const displayData = params.output_key === 'Density' && data?.result != null
+        ? { ...data, result: 1 / data.result, unit: 'kg/m³' }
+        : data
+      setResult(normalizeResult(displayData, params.output_key, params.output_unit, true))
+      return displayData
     } catch (e) {
       const msg = e.message || '请求失败'
       setError(msg)

@@ -81,4 +81,11 @@ export const HA_OUTPUT_OPTIONS = [
   { key: 'B', label: '湿球温度 T_wb' },
   { key: 'R', label: '相对湿度 R' },
   { key: 'V', label: '比容 v' },
+  { key: 'C', label: '定压比热 Cp (J/kg_da·K)' },
+  { key: 'Cha', label: '定压比热 Cha (J/kg_ha·K)' },
+  { key: 'CV', label: '定容比热 Cv (J/kg_da·K)' },
+  { key: 'CVha', label: '定容比热 Cv_ha (J/kg_ha·K)' },
+  { key: 'K', label: '导热系数 K (W/m/K)' },
+  { key: 'M', label: '动力粘度 μ (Pa·s)' },
+  { key: 'Density', label: '密度 ρ (kg/m³)' },
 ]
