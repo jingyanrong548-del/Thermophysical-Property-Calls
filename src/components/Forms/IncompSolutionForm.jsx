@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { INCOMP_SOLUTIONS, INCOMP_SOLUTION_LABELS, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
+import { INCOMP_SOLUTIONS, INCOMP_SOLUTION_LABELS, INCOMP_SOLUTION_RANGES, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
 import { getIncompSolutionName } from '../../hooks/useCoolProp'
 import { toSI, fromSI, getUnitsForFluidProperty } from '../../lib/units'
 
@@ -25,6 +25,7 @@ export default function IncompSolutionForm({ onQuery, result, error, loading, on
 
   const baseName = getIncompSolutionName(fluid)
   const fluidString = baseName ? `INCOMP::${baseName}` : ''
+  const range = INCOMP_SOLUTION_RANGES[baseName] ?? { min: 0, max: 1 }
   const units1 = sel(inputPair.k1)
   const units2 = sel(inputPair.k2)
   const unitsOut = sel(output)
@@ -35,11 +36,18 @@ export default function IncompSolutionForm({ onQuery, result, error, loading, on
   useEffect(() => {
     if (!unitsOut.some((u) => u.value === outputUnit)) setOutputUnit(unitsOut[0]?.value ?? outputUnit)
   }, [output])
+  useEffect(() => {
+    const r = INCOMP_SOLUTION_RANGES[getIncompSolutionName(fluid)] ?? { min: 0, max: 1 }
+    const frac = Number(concentration)
+    if (!Number.isNaN(frac) && (frac < r.min || frac > r.max)) {
+      setConcentration(((r.min + r.max) / 2).toFixed(2))
+    }
+  }, [fluid])
 
   const handleSubmit = (e) => {
     e.preventDefault()
     const frac = Number(concentration)
-    if (frac < 0 || frac > 1) return
+    if (frac < range.min || frac > range.max) return
     const si1 = toSI(inputPair.k1, val1, unit1, false)
     const si2 = toSI(inputPair.k2, val2, unit2, false)
     // CoolProp 不可压缩溶液格式：INCOMP::名称[浓度]，如 INCOMP::LiBr[0.23]、INCOMP::EG[0.5]
@@ -72,16 +80,18 @@ export default function IncompSolutionForm({ onQuery, result, error, loading, on
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-sm text-stone-400">浓度 Concentration (质量分数 0~1)</label>
+        <label className="mb-1 block text-sm text-stone-400">
+          浓度 (质量分数 {range.min}~{range.max})
+        </label>
         <input
           type="number"
-          min="0"
-          max="1"
+          min={range.min}
+          max={range.max}
           step="0.01"
           value={concentration}
           onChange={(e) => setConcentration(e.target.value)}
           className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-          placeholder="0.5"
+          placeholder={((range.min + range.max) / 2).toFixed(2)}
         />
       </div>
       <div>

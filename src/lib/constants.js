@@ -29,7 +29,7 @@ export const INCOMP_PURE_LABELS = {
 }
 
 /** CoolProp 不可压缩溶液（质量分数二元混合物，见 incompressible_list_solution）格式：INCOMP::名称[浓度] */
-export const INCOMP_SOLUTIONS = ['LiBr', 'MEG', 'MPG', 'MEG2', 'MPG2', 'IcePG', 'IceEA']
+export const INCOMP_SOLUTIONS = ['LiBr', 'MEG', 'MPG', 'MEG2', 'MPG2', 'IcePG', 'IceEA', 'MCA', 'MNA2', 'MMA', 'MMG', 'MAM', 'MKC', 'VKC']
 /** 溶液显示名（CoolProp ID → 中文说明） */
 export const INCOMP_SOLUTION_LABELS = {
   LiBr: 'LiBr 溴化锂水溶液',
@@ -39,6 +39,31 @@ export const INCOMP_SOLUTION_LABELS = {
   MPG2: 'MPG2 丙二醇(备选)',
   IcePG: 'IcePG 丙二醇冰点',
   IceEA: 'IceEA 乙醇胺冰点',
+  MCA: 'MCA 氯化钙水溶液',
+  MNA2: 'MNA2 氯化钠水溶液',
+  MMA: 'MMA 甲醇水溶液',
+  MMG: 'MMG 乙醇水溶液',
+  MAM: 'MAM 氨水溶液',
+  MKC: 'MKC 碳酸钾水溶液',
+  VKC: 'VKC 碳酸钾水溶液(VDI)',
+}
+
+/** 不可压缩溶液浓度范围（质量分数 0~1，来自 CoolProp 拟合报告） */
+export const INCOMP_SOLUTION_RANGES = {
+  LiBr: { min: 0, max: 0.7 },
+  MEG: { min: 0, max: 0.6 },
+  MPG: { min: 0, max: 0.6 },
+  MEG2: { min: 0, max: 0.6 },
+  MPG2: { min: 0, max: 0.6 },
+  IcePG: { min: 0, max: 0.6 },
+  IceEA: { min: 0, max: 0.5 },
+  MCA: { min: 0, max: 0.30 },
+  MNA2: { min: 0, max: 0.23 },
+  MMA: { min: 0, max: 0.60 },
+  MMG: { min: 0, max: 0.60 },
+  MAM: { min: 0, max: 0.40 },
+  MKC: { min: 0, max: 0.40 },
+  VKC: { min: 0, max: 0.50 },
 }
 
 /** 流体物性输出代码，与 API_所有类别调用规则.md 2.2 节一致 */
