@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { PURE_FLUIDS, OUTPUT_PROPS, INPUT_PAIRS } from '../../lib/constants'
+import { PURE_FLUIDS, OUTPUT_PROPS, INPUT_PAIRS, HEOS_QUICK_CALCS } from '../../lib/constants'
 import { buildFluidString } from '../../hooks/useCoolProp'
 import { toSI, fromSI, getUnitsForFluidProperty } from '../../lib/units'
 
@@ -12,20 +12,21 @@ function formatInputValue(num) {
   return Math.round(n) === n ? String(n) : String(Number(n.toFixed(8)))
 }
 
+// 默认案例：R142b / R22 质量比 0.8 : 0.2 → 摩尔分数（R22≈86.47, R142b≈100.50 g/mol）
 const DEFAULT_MIX = [
-  { name: 'R32', fraction: 0.697615 },
-  { name: 'R125', fraction: 0.302385 },
+  { name: 'R142b', fraction: 0.7747 },
+  { name: 'R22', fraction: 0.2253 },
 ]
 
 export default function HeosMixtureForm({ onQuery, result, error, loading, onResultUnitChange }) {
   const [parts, setParts] = useState(DEFAULT_MIX)
-  const [output, setOutput] = useState('D')
-  const [inputPair, setInputPair] = useState(INPUT_PAIRS[0])
-  const [val1, setVal1] = useState('300')
-  const [val2, setVal2] = useState('101325')
-  const [unit1, setUnit1] = useState(sel('T')[0].value)
-  const [unit2, setUnit2] = useState(sel('P')[0].value)
-  const [outputUnit, setOutputUnit] = useState(sel('D')[0].value)
+  const [output, setOutput] = useState('T')
+  const [inputPair, setInputPair] = useState(INPUT_PAIRS[1]) // P,Q，便于露点/泡点
+  const [val1, setVal1] = useState('1.0')
+  const [val2, setVal2] = useState('0.0')
+  const [unit1, setUnit1] = useState('bar')
+  const [unit2, setUnit2] = useState(sel('Q')[0].value)
+  const [outputUnit, setOutputUnit] = useState(sel('T')[0].value)
 
   const fluidString = buildFluidString(4, null, null, parts)
   const sum = parts.reduce((s, p) => s + (p.fraction || 0), 0)
@@ -51,6 +52,20 @@ export default function HeosMixtureForm({ onQuery, result, error, loading, onRes
   const addPart = () => setParts([...parts, { name: PURE_FLUIDS[0], fraction: 0 }])
   const removePart = (i) => setParts(parts.filter((_, idx) => idx !== i))
 
+  const applyQuickCalc = (preset) => {
+    const [k1, k2] = preset.inputPairKey.split(',')
+    const pair = INPUT_PAIRS.find((p) => p.k1 === k1 && p.k2 === k2)
+    if (pair) setInputPair(pair)
+    setOutput(preset.output)
+    setVal1(formatInputValue(preset.input1Default))
+    const qVal = preset.input2Default
+    setVal2(k2 === 'Q' && (qVal === 0 || qVal === 1) ? (qVal === 0 ? '0.0' : '1.0') : String(qVal))
+    const u1 = sel(k1)
+    const u2 = sel(k2)
+    setUnit1(u1[0]?.value ?? unit1)
+    setUnit2(u2[0]?.value ?? unit2)
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!validMix) return
@@ -70,6 +85,9 @@ export default function HeosMixtureForm({ onQuery, result, error, loading, onRes
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <p className="text-sm text-stone-500">
+        支持 (P,T)、(P,Q)、(T,Q) 三种状态输入，可求温度、压力、密度、焓、熵、比热、导热系数、粘度等；露点/泡点可用下方快捷计算。
+      </p>
       <div>
         <label className="mb-1 block text-sm text-stone-400">混合物组分 (HEOS:: 摩尔分数之和=1)</label>
         {parts.map((p, i) => (
@@ -106,6 +124,28 @@ export default function HeosMixtureForm({ onQuery, result, error, loading, onRes
             摩尔分数和 = {sum.toFixed(4)} {Math.abs(sum - 1) < 0.001 ? '✓' : '(需为 1)'}
           </p>
         )}
+      </div>
+      <div>
+        <label className="mb-1 block text-sm text-stone-400">混合冷媒常用计算</label>
+        <select
+          value=""
+          onChange={(e) => {
+            const id = e.target.value
+            if (id) {
+              const preset = HEOS_QUICK_CALCS.find((c) => c.id === id)
+              if (preset) applyQuickCalc(preset)
+              e.target.value = ''
+            }
+          }}
+          className="w-full rounded-lg border border-stone-600 bg-stone-900 px-3 py-2 text-stone-100 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        >
+          <option value="">— 选择快捷计算 —</option>
+          {HEOS_QUICK_CALCS.map((c) => (
+            <option key={c.id} value={c.id} title={c.desc}>
+              {c.label}：{c.desc}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label className="mb-1 block text-sm text-stone-400">输出量</label>

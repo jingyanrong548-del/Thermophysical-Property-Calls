@@ -10,7 +10,10 @@ export const FLUID_TYPES = [
   { id: 5, label: '湿空气', key: 'humid_air', prefix: null },
 ]
 
-export const PURE_FLUIDS = ['Water', 'R134a', 'R410A', 'R32', 'R125', 'Air', 'CO2', 'Nitrogen', 'Oxygen', 'Ethanol', 'Ammonia']
+export const PURE_FLUIDS = [
+  'Water', 'R134a', 'R410A', 'R32', 'R125', 'Air', 'CO2', 'Nitrogen', 'Oxygen', 'Ethanol', 'Ammonia',
+  'R22', 'R142b', 'R245fa', 'R1233zd(E)',
+]
 
 /** CoolProp 不可压缩纯流体（见 get_global_param_string("incompressible_list_pure")） */
 export const INCOMP_PURE = ['DowJ', 'DowQ', 'Water', 'NBS', 'HC20', 'HC30', 'HC40', 'T66', 'TVP1', 'PCL']
@@ -82,10 +85,19 @@ export const OUTPUT_PROPS = [
 
 export const INPUT_PAIRS = [
   { k1: 'T', k2: 'P', label: 'T (K) + P (Pa)' },
+  { k1: 'P', k2: 'Q', label: 'P (Pa) + Q (干度 0~1)' },
+  { k1: 'T', k2: 'Q', label: 'T (K) + Q (干度 0~1)' },
   { k1: 'T', k2: 'D', label: 'T (K) + D (kg/m³)' },
   { k1: 'P', k2: 'D', label: 'P (Pa) + D (kg/m³)' },
   { k1: 'P', k2: 'H', label: 'P (Pa) + H (J/kg)' },
-  { k1: 'T', k2: 'Q', label: 'T (K) + Q (干度 0~1)' },
+]
+
+/** 混合冷媒常用计算预设：露点、泡点等（仅 HEOS 可压缩混合物）；先选计算类型，再填 P 或 T */
+export const HEOS_QUICK_CALCS = [
+  { id: 'bubble_T', label: '泡点温度', desc: '给定 P，Q=0 → 填 P 求 T', inputPairKey: 'P,Q', q: 0, output: 'T', input1Default: 101325, input2Default: 0 },
+  { id: 'dew_T', label: '露点温度', desc: '给定 P，Q=1 → 填 P 求 T', inputPairKey: 'P,Q', q: 1, output: 'T', input1Default: 101325, input2Default: 1 },
+  { id: 'bubble_P', label: '泡点压力', desc: '给定 T，Q=0 → 填 T 求 P', inputPairKey: 'T,Q', q: 0, output: 'P', input1Default: 300, input2Default: 0 },
+  { id: 'dew_P', label: '露点压力', desc: '给定 T，Q=1 → 填 T 求 P', inputPairKey: 'T,Q', q: 1, output: 'P', input1Default: 300, input2Default: 1 },
 ]
 
 /** 湿空气：3 个独立状态参数 */
