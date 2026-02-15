@@ -2,6 +2,10 @@
 
 基于 **CoolProp 统一 API** 的物性查询 Web 应用，严格遵循 **coolpropapi.jingyanrong.com** 规范：`API_所有类别调用规则.md`、`EXTERNAL_API_CALL_GUIDE.md`（五大工质分类、请求/响应格式）。
 
+- **创作**：荆炎荣  
+- **物性来源**：本应用通过统一 API 调用 [CoolProp](http://www.coolprop.org/) 进行物性计算，数据与公式以 CoolProp 及所引文献为准，本仓库不保证计算结果的工程适用性。  
+- **免责声明**：本工具仅供学习与参考使用。物性数据及计算结果不构成任何工程或商业决策依据；使用者需自行核实并承担使用后果，作者不承担任何直接或间接责任。
+
 **本应用不包含后端**，所有物性计算请求发往统一 API：
 
 - **生产**：`https://coolpropapi.jingyanrong.com`

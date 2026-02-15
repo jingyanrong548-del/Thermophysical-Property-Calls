@@ -66,6 +66,13 @@ export default function App() {
             <ResultCard result={result} error={error} loading={loading} resultUnit={resultUnit} />
           </section>
         </div>
+
+        {/* 免责声明 · 创作 · 物性来源 */}
+        <footer className="mt-12 rounded-xl border border-stone-700 bg-stone-900/20 px-6 py-4 text-xs text-stone-500">
+          <p><strong className="text-stone-400">创作</strong>：荆炎荣</p>
+          <p className="mt-1"><strong className="text-stone-400">物性来源</strong>：本应用通过统一 API 调用 CoolProp 进行物性计算，数据与公式以 CoolProp 及所引文献为准，不保证计算结果的工程适用性。</p>
+          <p className="mt-2 text-stone-500/90"><strong className="text-stone-400">免责声明</strong>：本工具仅供学习与参考使用。物性数据及计算结果不构成任何工程或商业决策依据；使用者需自行核实并承担使用后果，作者不承担任何直接或间接责任。</p>
+        </footer>
       </div>
     </div>
   )
